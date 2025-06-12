@@ -1,71 +1,419 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página com Botões Interativos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carta + Quiz Dia dos Namorados 💌💖</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .pagina {
+      width: 100%;
+      height: 100vh;
       padding: 20px;
-      background-color: #f2f2f2;
-      transition: background-color 0.3s ease;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
-    h1 {
-      color: #333;
+    .pagina.ativa {
+      display: flex;
     }
-    button {
-      padding: 10px 20px;
-      margin: 10px 5px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
+
+    /* Envelope */
+    .envelope {
+      background: white;
+      width: 300px;
+      height: 200px;
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border: 2px solid #ddd;
+    }
+    .envelope::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: #f0f0f0;
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    .coracao {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      color: #e91e63;
       cursor: pointer;
-      transition: transform 0.2s;
+      z-index: 10;
+      transition: transform 0.3s ease;
     }
-    button:hover {
-      transform: scale(1.05);
+    .coracao:hover {
+      transform: translate(-50%, -50%) scale(1.3);
     }
-    .azul { background-color: #3498db; color: white; }
-    .verde { background-color: #2ecc71; color: white; }
-    .vermelho { background-color: #e74c3c; color: white; }
-    #mensagem {
-      margin-top: 30px;
-      font-size: 18px;
+
+    /* Carta */
+    .carta {
+      max-width: 90%;
+      max-height: 90vh;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
     }
-    @media (max-width: 600px) {
-      button {
-        width: 100%;
-      }
+    .carta h1 {
+      color: #e91e63;
+      margin-bottom: 20px;
+    }
+    .carta p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      color: #444;
+      text-align: justify;
+      margin-bottom: 15px;
+    }
+    .btn-musica {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #e91e63;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+    .btn-musica:hover {
+      background: #c2185b;
+    }
+    .carta::-webkit-scrollbar {
+      width: 8px;
+    }
+    .carta::-webkit-scrollbar-thumb {
+      background: #f48fb1;
+      border-radius: 10px;
+    }
+
+    /* Quiz */
+    #quiz-container {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    #quiz-container h1 {
+      color: #e91e63;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 14px;
+      background: #ff6f91;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease, opacity 0.3s ease;
+    }
+    .options button:hover {
+      background: #d94f6e;
+    }
+    #next-btn {
+      margin-top: 20px;
+      background: #e91e63;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1.1em;
+      cursor: pointer;
+      display: none;
+      width: 100%;
+    }
+    #result {
+      font-size: 1.1em;
+      margin-top: 20px;
+      color: #333;
+      text-align: left;
+    }
+    #result p {
+      font-size: 1.2em;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+    .retry-btn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #e91e63;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    .retry-btn:hover {
+      background: #c2185b;
     }
   </style>
 </head>
 <body>
 
-  <h1>Teste de Botões Interativos</h1>
+  <!-- Página 1: Envelope -->
+  <div class="pagina ativa" id="pagina-envelope">
+    <div class="envelope">
+      <div class="coracao" onclick="abrirQuiz()">❤️</div>
+    </div>
+    <p style="margin-top: 20px; color: #c62828;">Clique no coração para abrir o quiz 💖</p>
+  </div>
 
-  <button class="azul" onclick="mostrarMensagem('Você clicou no botão Azul!')">Botão Azul</button>
-  <button class="verde" onclick="mostrarMensagem('Você clicou no botão Verde!')">Botão Verde</button>
-  <button class="vermelho" onclick="mudarFundo()">Mudar Cor de Fundo</button>
+  <!-- Página 2: Quiz -->
+  <div class="pagina" id="pagina-quiz">
+    <div id="quiz-container">
+      <h1>Quiz do Dia dos Namorados 💖</h1>
+      <div class="question"></div>
+      <div class="options"></div>
+      <button id="next-btn">Próxima</button>
+      <div id="result"></div>
+    </div>
+  </div>
 
-  <div id="mensagem"></div>
+  <!-- Página 3: Carta -->
+  <div class="pagina" id="pagina-carta">
+    <div class="carta">
+      <h1>Meu amor ❤️</h1>
+
+      <p>Oiii, amor da minha vida</p>
+      <p>Me arrependo duramente dos momentos que eu não me lembrei, não consegui falar o que sentia, não me esforcei o suficiente ou não insisti mais.</p>
+      <p>Eu me esforço, é duro ouvir coisas e sentir que não foi o suficiente, mas sei que algumas vezes, talvez muitas, realmente não seja o suficiente. Sou tão grato por tua paciência.</p>
+      <p>Sei que também tem seus desafios, medos, inseguranças...</p>
+      <p>Só queria que soubesse que eu me preocupo, só não sei como ajudar, ou não consigo expressar isso, mas eu penso e oro muito para saber como posso ajudar de alguma forma, e graças à bondade do Senhor às vezes dá certo kkkk, às vezes dá tudo errado, mas faz parte, eu acho kkkk. Espero que algum dia isso possa ser diferente.</p>
+      <p>Meu amor por você não se limita apenas a um "eu te amo", e se eu fosse resumir tudo em uma única frase talvez fosse: <strong>"Por favor, não vá."</strong></p>
+      <p>Ainda tenho muito pra mudar, mas eu realmente já sou outra pessoa. Você é privilegiada, viu kkkk — ou seria mais correto dizer, você é eleita.</p>
+      <p>Saiba que você é o <strong>MEU AMOR</strong> e que eu te amo mais do que até eu mesmo poderia imaginar.</p>
+
+      <p style="margin-top: 20px; font-style: italic;">Com todo o meu amor,<br><strong>Seu Amor 💕</strong></p>
+
+      <a class="btn-musica" href="https://open.spotify.com/playlist/37i9dQZF1DWXbttAJcbphz" target="_blank" rel="noopener noreferrer">
+        Deixe a nossa playlist tocar enquanto você lê. 🎵
+      </a>
+    </div>
+  </div>
 
   <script>
-    function mostrarMensagem(texto) {
-      document.getElementById('mensagem').textContent = texto;
+    // Função para ir para o quiz
+    function abrirQuiz() {
+      document.getElementById('pagina-envelope').classList.remove('ativa');
+      document.getElementById('pagina-quiz').classList.add('ativa');
+      iniciarQuiz();
     }
 
-    function mudarFundo() {
-      const cores = ['#f2f2f2', '#ffeaa7', '#dfe6e9', '#fab1a0'];
-      const corAtual = document.body.style.backgroundColor;
-      let novaCor = cores[Math.floor(Math.random() * cores.length)];
-      while (novaCor === corAtual) {
-        novaCor = cores[Math.floor(Math.random() * cores.length)];
+    // Dados do Quiz
+    const quizData = [
+      {
+        question: "Qual é a nossa refeição favorita?",
+        options: ["Bife lavado", "Pizza", "Sushi", "Mc Donalds"],
+        answer: "Sushi"
+      },
+      {
+        question: "Qual era a cor da minha caminha no nosso primeiro encontro?",
+        options: ["Preta", "Roxa", "Azul", "Verde"],
+        answer: "Preta"
+      },
+      {
+        question: "Qual foi a última vez que eu falei que te amo?",
+        options: ["Ontem", "Hoje", "+/- 10 minutos atrás", "Agorinha"],
+        answer: "+/- 10 minutos atrás"
+      },
+      {
+        question: "Qual é a primeira música da nossa playlist?",
+        options: ["Yellow", "My Love Mine All Mine", "De Todos Os Loucos Do Mundo", "Oração"],
+        answer: "My Love Mine All Mine"
+      },
+      {
+        question: "Acho que está indo bem, mas vou facilitar... \"Boa tarde\"",
+        options: ["Te amo", "Sinto sua falta", "Mais do que ontem, e menos do que amanhã", "Saudades"],
+        answer: "Saudades"
       }
-      document.body.style.backgroundColor = novaCor;
+    ];
+
+    // Elementos do quiz
+    const questionEl = document.querySelector('#pagina-quiz .question');
+    const optionsEl = document.querySelector('#pagina-quiz .options');
+    const nextBtn = document.getElementById('next-btn');
+    const resultEl = document.getElementById('result');
+
+    let currentQuiz = 0;
+    let score = 0;
+    let selectedOption = null;
+    let attempt = 1;
+
+    function iniciarQuiz() {
+      currentQuiz = 0;
+      score = 0;
+      selectedOption = null;
+      attempt = 1;
+      nextBtn.style.display = 'none';
+      resultEl.innerText = '';
+      carregarQuestao();
+    }
+
+    function carregarQuestao() {
+      attempt = 1;
+      selectedOption = null;
+      nextBtn.style.display = 'none';
+      resultEl.innerText = '';
+      questionEl.style.display = 'block';
+      optionsEl.style.display = 'block';
+
+      const currentQuizData = quizData[currentQuiz];
+      questionEl.innerText = currentQuizData.question;
+      optionsEl.innerHTML = '';
+
+      currentQuizData.options.forEach(option => {
+        const button = document.createElement('button');
+        button.innerText = option;
+        button.style.opacity = '1';
+        button.style.pointerEvents = 'auto';
+        button.addEventListener('click', () => selecionarOpcao(button, option));
+        optionsEl.appendChild(button);
+      });
+    }
+
+    function selecionarOpcao(button, option) {
+      if (!selectedOption) {
+        selectedOption = option;
+
+        const correctAnswer = quizData[currentQuiz].answer;
+
+        Array.from(optionsEl.children).forEach(btn => {
+          btn.style.pointerEvents = 'none';
+          btn.style.opacity = btn.innerText === option ? '1' : '0.5';
+        });
+
+        if (option === correctAnswer) {
+          const pontos = attempt === 1 ? 2 : 1;
+          score += pontos;
+          resultEl.innerText = `✅ Resposta correta! Você ganhou ${pontos} ponto${pontos > 1 ? 's' : ''}!`;
+          nextBtn.style.display = 'inline-block';
+        } else {
+          if (attempt === 1) {
+            attempt++;
+            selectedOption = null;
+            resultEl.innerText = "❌ Resposta incorreta. Tente mais uma vez!";
+            setTimeout(() => {
+              resultEl.innerText = '';
+              Array.from(optionsEl.children).forEach(btn => {
+                btn.style.pointerEvents = 'auto';
+                btn.style.opacity = '1';
+              });
+            }, 1500);
+          } else {
+            resultEl.innerText = "❌ Resposta incorreta. Você não ganhou pontos.";
+            nextBtn.style.display = 'inline-block';
+          }
+        }
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      currentQuiz++;
+      if (currentQuiz < quizData.length) {
+        carregarQuestao();
+      } else {
+        mostrarResultado();
+      }
+    });
+
+    function mostrarResultado() {
+      questionEl.style.display = 'none';
+      optionsEl.style.display = 'none';
+      nextBtn.style.display = 'none';
+
+      let premio = '';
+      let retryButton = '';
+
+      if (score <= 3) {
+        premio = "Parabéns meu amor, mas você tem um potencial maior, vamos tentar dnovo?";
+        retryButton = `<br><br><button class="retry-btn" onclick="reiniciarQuiz()">Tentar novamente</button>`;
+      } else if (score <= 6) {
+        premio = "💌 Você liberou apenas a carta. Ela foi escrita há algum tempo, em momentos e períodos diferentes, e gostaria que soubesse disso.";
+      } else if (score === 7) {
+        premio = "💌 Você liberou a carta. Ela foi escrita há algum tempo, em momentos e períodos diferentes, e gostaria que soubesse disso + R$50.";
+      } else if (score === 8) {
+        premio = "💌 Você liberou a carta. Ela foi escrita há algum tempo, em momentos e períodos diferentes, e gostaria que soubesse disso + 1 chocolate.";
+      } else if (score === 9) {
+        premio = "💌 Você liberou a carta. Ela foi escrita há algum tempo, em momentos e períodos diferentes, e gostaria que soubesse disso + 1 Vale encontro.";
+      } else if (score === 10) {
+        premio = "💌 Você liberou a carta. Ela foi escrita há algum tempo, em momentos e períodos diferentes, e gostaria que soubesse disso + 1 Vale foto.";
+      }
+
+      resultEl.innerHTML = `
+        <p>
+          Você fez <strong>${score}</strong> de <strong>${quizData.length * 2}</strong> pontos!<br><br>
+          ${premio}
+        </p>
+        ${retryButton}
+      `;
+
+      if (score > 3) {
+        const btnCarta = document.createElement('button');
+        btnCarta.className = 'btn-musica';
+        btnCarta.innerText = 'Abrir Carta';
+        btnCarta.style.marginTop = '20px'; // botão desce uma linha
+        btnCarta.style.display = 'block';
+        btnCarta.style.width = '100%';
+        btnCarta.onclick = mostrarCarta;
+        resultEl.appendChild(btnCarta);
+      }
+    }
+
+    function reiniciarQuiz() {
+      resultEl.innerHTML = '';
+      iniciarQuiz();
+      questionEl.style.display = 'block';
+      optionsEl.style.display = 'block';
+      nextBtn.style.display = 'none';
+    }
+
+    function mostrarCarta() {
+      document.getElementById('pagina-quiz').classList.remove('ativa');
+      document.getElementById('pagina-carta').classList.add('ativa');
     }
   </script>
-
 </body>
 </html>
