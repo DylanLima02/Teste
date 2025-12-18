@@ -22,8 +22,8 @@ html,body{
 }
 
 #anel{
-  width:130px;
-  height:130px;
+  width:130px; /* 🔧 TAMANHO DO ANEL */
+  height:130px; /* 🔧 TAMANHO DO ANEL */
   position:absolute;
   display:none;
   background:url("ring.png") no-repeat center;
@@ -58,6 +58,7 @@ const som = document.getElementById("som");
 
 let ativo = false;
 let segurando = false;
+let offset = 65; // metade do tamanho do anel
 
 function mostrar(x,y){
   anel.style.display = "block";
@@ -66,29 +67,29 @@ function mostrar(x,y){
 }
 
 function mover(x,y){
-  anel.style.left = (x - 45) + "px";
-  anel.style.top  = (y - 45) + "px";
+  anel.style.left = (x - offset) + "px";
+  anel.style.top  = (y - offset) + "px";
 }
 
 function saiuDireita(x){
-  return x > window.innerWidth + 40;
+  return x > window.innerWidth + offset;
 }
 
 function desaparecer(){
   som.currentTime = 0;
   som.play();
 
-  anel.style.transition = "transform .3s, opacity .3s";
-  anel.style.transform += " scale(0.3) translateX(120px)";
+  anel.style.transition = "transform .35s ease-out, opacity .35s";
+  anel.style.transform = "translateX(160px) scale(0.3)"; /* 👉 FORÇA PARA DIREITA */
   anel.style.opacity = "0";
 
   setTimeout(()=>{
     anel.style.display = "none";
     anel.style.opacity = "1";
-    anel.style.transform = "";
+    anel.style.transform = "translateX(0) scale(1)";
     anel.style.transition = "none";
     ativo = false;
-  },300);
+  },350);
 }
 
 /* TOUCH */
@@ -122,6 +123,14 @@ stage.addEventListener("mousemove",e=>{
 });
 
 document.addEventListener("mouseup",()=>segurando=false);
+
+/* 🔲 TELA CHEIA (ativa no primeiro toque) */
+document.body.addEventListener("click",()=>{
+  if(document.fullscreenElement) return;
+  if(document.documentElement.requestFullscreen){
+    document.documentElement.requestFullscreen();
+  }
+},{once:true});
 </script>
 </body>
 </html>
