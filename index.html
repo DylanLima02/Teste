@@ -22,8 +22,8 @@ html,body{
 }
 
 #anel{
-  width:130px; /* 🔧 TAMANHO DO ANEL */
-  height:130px; /* 🔧 TAMANHO DO ANEL */
+  width:100px;
+  height:100px;
   position:absolute;
   display:none;
   background:url("ring.png") no-repeat center;
@@ -41,6 +41,19 @@ html,body{
   font-family:Arial, sans-serif;
   font-size:14px;
 }
+
+#fullscreenBtn{
+  position:fixed;
+  top:15px;
+  right:15px;
+  padding:10px 14px;
+  background:rgba(255,255,255,0.15);
+  color:white;
+  border:1px solid rgba(255,255,255,0.3);
+  border-radius:8px;
+  font-size:13px;
+  z-index:999;
+}
 </style>
 </head>
 
@@ -51,14 +64,17 @@ html,body{
   <div id="hint">Toque para revelar • Arraste para a direita</div>
 </div>
 
+<button id="fullscreenBtn">Tela cheia</button>
+
 <script>
 const stage = document.getElementById("stage");
 const anel = document.getElementById("anel");
 const som = document.getElementById("som");
+const fsBtn = document.getElementById("fullscreenBtn");
 
 let ativo = false;
 let segurando = false;
-let offset = 65; // metade do tamanho do anel
+let offset = 50;
 
 function mostrar(x,y){
   anel.style.display = "block";
@@ -80,7 +96,7 @@ function desaparecer(){
   som.play();
 
   anel.style.transition = "transform .35s ease-out, opacity .35s";
-  anel.style.transform = "translateX(160px) scale(0.3)"; /* 👉 FORÇA PARA DIREITA */
+  anel.style.transform = "translateX(180px) scale(0.3)";
   anel.style.opacity = "0";
 
   setTimeout(()=>{
@@ -124,13 +140,13 @@ stage.addEventListener("mousemove",e=>{
 
 document.addEventListener("mouseup",()=>segurando=false);
 
-/* 🔲 TELA CHEIA (ativa no primeiro toque) */
-document.body.addEventListener("click",()=>{
-  if(document.fullscreenElement) return;
-  if(document.documentElement.requestFullscreen){
-    document.documentElement.requestFullscreen();
-  }
-},{once:true});
+/* 🔲 BOTÃO DE TELA CHEIA (compatível) */
+fsBtn.addEventListener("click",()=>{
+  const el = document.documentElement;
+  if(el.requestFullscreen) el.requestFullscreen();
+  else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  fsBtn.style.display = "none";
+});
 </script>
 </body>
 </html>
