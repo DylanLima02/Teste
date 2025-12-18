@@ -22,8 +22,8 @@ html,body{
 }
 
 #anel{
-  width:200px;
-  height:200px;
+  width:100px;
+  height:100px;
   position:absolute;
   display:none;
   background:url("ring.png") no-repeat center;
@@ -74,6 +74,8 @@ const fsBtn = document.getElementById("fullscreenBtn");
 
 let ativo = false;
 let segurando = false;
+let velocidadeX = 0;
+let ultimaX = 0;
 
 function mostrar(x,y){
   anel.style.display = "block";
@@ -93,21 +95,37 @@ function saiuDireita(){
   return rect.left > window.innerWidth;
 }
 
+function deslizar(){
+  if(!ativo) return;
+
+  velocidadeX *= 0.98; // atrito do gelo
+
+  const atualX = anel.offsetLeft + velocidadeX;
+  anel.style.left = atualX + "px";
+
+  if(saiuDireita()){
+    desaparecer();
+    return;
+  }
+
+  if(Math.abs(velocidadeX) > 0.5){
+    requestAnimationFrame(deslizar);
+  }
+}
+
 function desaparecer(){
   som.currentTime = 0;
   som.play();
 
-  anel.style.transition = "transform .35s ease-out, opacity .35s";
-  anel.style.transform = "translateX(300px) scale(0.2)";
+  anel.style.transition = "opacity .3s";
   anel.style.opacity = "0";
 
   setTimeout(()=>{
     anel.style.display = "none";
     anel.style.opacity = "1";
-    anel.style.transform = "translateX(0) scale(1)";
     anel.style.transition = "none";
     ativo = false;
-  },350);
+  },300);
 }
 
 /* TOUCH */
@@ -115,6 +133,7 @@ stage.addEventListener("touchstart",e=>{
   e.preventDefault();
   const t = e.touches[0];
   segurando = true;
+  ultimaX = t.clientX;
   if(!ativo) mostrar(t.clientX,t.clientY);
 },{passive:false});
 
@@ -122,25 +141,34 @@ stage.addEventListener("touchmove",e=>{
   e.preventDefault();
   if(!ativo || !segurando) return;
   const t = e.touches[0];
+  velocidadeX = t.clientX - ultimaX;
+  ultimaX = t.clientX;
   mover(t.clientX,t.clientY);
-  if(saiuDireita()) desaparecer();
 },{passive:false});
 
-stage.addEventListener("touchend",()=>segurando=false);
+stage.addEventListener("touchend",()=>{
+  segurando = false;
+  deslizar();
+});
 
 /* MOUSE */
 stage.addEventListener("mousedown",e=>{
   segurando = true;
+  ultimaX = e.clientX;
   if(!ativo) mostrar(e.clientX,e.clientY);
 });
 
 stage.addEventListener("mousemove",e=>{
   if(!ativo || !segurando) return;
+  velocidadeX = e.clientX - ultimaX;
+  ultimaX = e.clientX;
   mover(e.clientX,e.clientY);
-  if(saiuDireita()) desaparecer();
 });
 
-document.addEventListener("mouseup",()=>segurando=false);
+document.addEventListener("mouseup",()=>{
+  segurando = false;
+  deslizar();
+});
 
 /* 🔲 BOTÃO DE TELA CHEIA */
 fsBtn.addEventListener("click",()=>{
