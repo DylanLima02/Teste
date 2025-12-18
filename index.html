@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mágica do Anel – Debug</title>
+  <title>Mágica do Anel</title>
 
   <style>
     html, body {
@@ -19,8 +19,7 @@
       width: 100vw;
       height: 100vh;
       position: relative;
-      user-select: none;
-      -webkit-user-select: none;
+      touch-action: none; /* FUNDAMENTAL */
     }
 
     #objeto {
@@ -31,7 +30,7 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background-image: url("ring.png"); /* TROQUE AQUI */
+      background-image: url("ring.png"); /* TROQUE AQUI PELO SEU ANEL */
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -44,7 +43,7 @@
       bottom: 20px;
       width: 100%;
       text-align: center;
-      color: #aaa;
+      color: #777;
       font-family: Arial, sans-serif;
       font-size: 14px;
       pointer-events: none;
@@ -56,7 +55,7 @@
   <div id="stage">
     <audio id="somMagica" src="magica.mp3" preload="auto"></audio>
     <div id="objeto"></div>
-    <div id="texto">Toque ou clique para revelar</div>
+    <div id="texto">Toque para revelar • Arraste para a direita</div>
   </div>
 
   <script>
@@ -65,13 +64,21 @@
     const som = document.getElementById('somMagica');
 
     let ativo = false;
+    let segurando = false;
 
-    function mostrarCentro() {
+    function mostrarObjeto(x, y) {
       objeto.style.display = 'block';
-      objeto.style.left = '50%';
-      objeto.style.top = '50%';
+      moverObjeto(x, y);
       ativo = true;
-      console.log('Objeto exibido');
+    }
+
+    function moverObjeto(x, y) {
+      objeto.style.left = x + 'px';
+      objeto.style.top = y + 'px';
+    }
+
+    function saiuPelaDireita(x) {
+      return x > window.innerWidth + 30;
     }
 
     function desaparecer() {
@@ -80,27 +87,55 @@
         som.play();
       } catch (e) {}
 
-      objeto.style.transition = 'transform 0.3s, opacity 0.3s';
+      objeto.style.transition = 'transform 0.35s ease, opacity 0.35s';
       objeto.style.transform = 'translate(-50%, -50%) scale(0.2) translateX(120px)';
       objeto.style.opacity = '0';
 
       setTimeout(() => {
         objeto.style.display = 'none';
         objeto.style.opacity = '1';
-        objeto.style.transform = 'translate(-50%, -50%)';
+        objeto.style.transform = 'translate(-50%, -50%) scale(1)';
         objeto.style.transition = 'none';
         ativo = false;
-      }, 300);
+        segurando = false;
+      }, 350);
     }
 
-    /* TESTE MÁXIMO DE COMPATIBILIDADE */
-    stage.onclick = () => {
-      if (!ativo) {
-        mostrarCentro();
-      } else {
-        desaparecer();
-      }
-    };
+    /* COMPATÍVEL COM CREATPAD / IFRAME */
+    stage.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      segurando = true;
+      if (!ativo) mostrarObjeto(t.clientX, t.clientY);
+    }, { passive: false });
+
+    stage.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (!ativo || !segurando) return;
+      const t = e.touches[0];
+      moverObjeto(t.clientX, t.clientY);
+      if (saiuPelaDireita(t.clientX)) desaparecer();
+    }, { passive: false });
+
+    stage.addEventListener('touchend', () => {
+      segurando = false;
+    });
+
+    /* fallback mouse */
+    stage.addEventListener('mousedown', (e) => {
+      segurando = true;
+      if (!ativo) mostrarObjeto(e.clientX, e.clientY);
+    });
+
+    stage.addEventListener('mousemove', (e) => {
+      if (!ativo || !segurando) return;
+      moverObjeto(e.clientX, e.clientY);
+      if (saiuPelaDireita(e.clientX)) desaparecer();
+    });
+
+    stage.addEventListener('mouseup', () => {
+      segurando = false;
+    });
   </script>
 </body>
 </html>
