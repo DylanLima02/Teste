@@ -1,141 +1,127 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mágica do Anel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mágica do Anel</title>
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      overflow: hidden;
-    }
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:black;
+  overflow:hidden;
+  touch-action:none;
+}
 
-    #stage {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-      touch-action: none; /* FUNDAMENTAL */
-    }
+#stage{
+  width:100vw;
+  height:100vh;
+  position:relative;
+}
 
-    #objeto {
-      width: 90px;
-      height: 90px;
-      position: absolute;
-      display: none;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background-image: url("ring.png"); /* TROQUE AQUI PELO SEU ANEL */
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      filter: drop-shadow(0 0 20px rgba(255,215,0,0.9));
-      pointer-events: none;
-    }
+#anel{
+  width:130px;
+  height:130px;
+  position:absolute;
+  display:none;
+  background:url("ring.png") no-repeat center;
+  background-size:contain;
+  filter:drop-shadow(0 0 25px gold);
+  pointer-events:none;
+}
 
-    #texto {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      color: #777;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      pointer-events: none;
-    }
-  </style>
+#hint{
+  position:absolute;
+  bottom:20px;
+  width:100%;
+  text-align:center;
+  color:#888;
+  font-family:Arial, sans-serif;
+  font-size:14px;
+}
+</style>
 </head>
 
 <body>
-  <div id="stage">
-    <audio id="somMagica" src="magica.mp3" preload="auto"></audio>
-    <div id="objeto"></div>
-    <div id="texto">Toque para revelar • Arraste para a direita</div>
-  </div>
+<div id="stage">
+  <audio id="som" src="magica.mp3" preload="auto"></audio>
+  <div id="anel"></div>
+  <div id="hint">Toque para revelar • Arraste para a direita</div>
+</div>
 
-  <script>
-    const stage = document.getElementById('stage');
-    const objeto = document.getElementById('objeto');
-    const som = document.getElementById('somMagica');
+<script>
+const stage = document.getElementById("stage");
+const anel = document.getElementById("anel");
+const som = document.getElementById("som");
 
-    let ativo = false;
-    let segurando = false;
+let ativo = false;
+let segurando = false;
 
-    function mostrarObjeto(x, y) {
-      objeto.style.display = 'block';
-      moverObjeto(x, y);
-      ativo = true;
-    }
+function mostrar(x,y){
+  anel.style.display = "block";
+  mover(x,y);
+  ativo = true;
+}
 
-    function moverObjeto(x, y) {
-      objeto.style.left = x + 'px';
-      objeto.style.top = y + 'px';
-    }
+function mover(x,y){
+  anel.style.left = (x - 45) + "px";
+  anel.style.top  = (y - 45) + "px";
+}
 
-    function saiuPelaDireita(x) {
-      return x > window.innerWidth + 30;
-    }
+function saiuDireita(x){
+  return x > window.innerWidth + 40;
+}
 
-    function desaparecer() {
-      try {
-        som.currentTime = 0;
-        som.play();
-      } catch (e) {}
+function desaparecer(){
+  som.currentTime = 0;
+  som.play();
 
-      objeto.style.transition = 'transform 0.35s ease, opacity 0.35s';
-      objeto.style.transform = 'translate(-50%, -50%) scale(0.2) translateX(120px)';
-      objeto.style.opacity = '0';
+  anel.style.transition = "transform .3s, opacity .3s";
+  anel.style.transform += " scale(0.3) translateX(120px)";
+  anel.style.opacity = "0";
 
-      setTimeout(() => {
-        objeto.style.display = 'none';
-        objeto.style.opacity = '1';
-        objeto.style.transform = 'translate(-50%, -50%) scale(1)';
-        objeto.style.transition = 'none';
-        ativo = false;
-        segurando = false;
-      }, 350);
-    }
+  setTimeout(()=>{
+    anel.style.display = "none";
+    anel.style.opacity = "1";
+    anel.style.transform = "";
+    anel.style.transition = "none";
+    ativo = false;
+  },300);
+}
 
-    /* COMPATÍVEL COM CREATPAD / IFRAME */
-    stage.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const t = e.touches[0];
-      segurando = true;
-      if (!ativo) mostrarObjeto(t.clientX, t.clientY);
-    }, { passive: false });
+/* TOUCH */
+stage.addEventListener("touchstart",e=>{
+  e.preventDefault();
+  const t = e.touches[0];
+  segurando = true;
+  if(!ativo) mostrar(t.clientX,t.clientY);
+},{passive:false});
 
-    stage.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      if (!ativo || !segurando) return;
-      const t = e.touches[0];
-      moverObjeto(t.clientX, t.clientY);
-      if (saiuPelaDireita(t.clientX)) desaparecer();
-    }, { passive: false });
+stage.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  if(!ativo || !segurando) return;
+  const t = e.touches[0];
+  mover(t.clientX,t.clientY);
+  if(saiuDireita(t.clientX)) desaparecer();
+},{passive:false});
 
-    stage.addEventListener('touchend', () => {
-      segurando = false;
-    });
+stage.addEventListener("touchend",()=>segurando=false);
 
-    /* fallback mouse */
-    stage.addEventListener('mousedown', (e) => {
-      segurando = true;
-      if (!ativo) mostrarObjeto(e.clientX, e.clientY);
-    });
+/* MOUSE */
+stage.addEventListener("mousedown",e=>{
+  segurando = true;
+  if(!ativo) mostrar(e.clientX,e.clientY);
+});
 
-    stage.addEventListener('mousemove', (e) => {
-      if (!ativo || !segurando) return;
-      moverObjeto(e.clientX, e.clientY);
-      if (saiuPelaDireita(e.clientX)) desaparecer();
-    });
+stage.addEventListener("mousemove",e=>{
+  if(!ativo || !segurando) return;
+  mover(e.clientX,e.clientY);
+  if(saiuDireita(e.clientX)) desaparecer();
+});
 
-    stage.addEventListener('mouseup', () => {
-      segurando = false;
-    });
-  </script>
+document.addEventListener("mouseup",()=>segurando=false);
+</script>
 </body>
 </html>
