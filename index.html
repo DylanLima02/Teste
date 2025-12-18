@@ -74,7 +74,6 @@ const fsBtn = document.getElementById("fullscreenBtn");
 
 let ativo = false;
 let segurando = false;
-let offset = 100;
 
 function mostrar(x,y){
   anel.style.display = "block";
@@ -83,12 +82,15 @@ function mostrar(x,y){
 }
 
 function mover(x,y){
-  anel.style.left = (x - offset) + "px";
-  anel.style.top  = (y - offset) + "px";
+  const w = anel.offsetWidth;
+  const h = anel.offsetHeight;
+  anel.style.left = (x - w/2) + "px";
+  anel.style.top  = (y - h/2) + "px";
 }
 
-function saiuDireita(x){
-  return x > window.innerWidth + offset;
+function saiuDireita(){
+  const rect = anel.getBoundingClientRect();
+  return rect.left > window.innerWidth;
 }
 
 function desaparecer(){
@@ -96,7 +98,7 @@ function desaparecer(){
   som.play();
 
   anel.style.transition = "transform .35s ease-out, opacity .35s";
-  anel.style.transform = "translateX(180px) scale(0.3)";
+  anel.style.transform = "translateX(300px) scale(0.2)";
   anel.style.opacity = "0";
 
   setTimeout(()=>{
@@ -121,7 +123,7 @@ stage.addEventListener("touchmove",e=>{
   if(!ativo || !segurando) return;
   const t = e.touches[0];
   mover(t.clientX,t.clientY);
-  if(saiuDireita(t.clientX)) desaparecer();
+  if(saiuDireita()) desaparecer();
 },{passive:false});
 
 stage.addEventListener("touchend",()=>segurando=false);
@@ -135,12 +137,12 @@ stage.addEventListener("mousedown",e=>{
 stage.addEventListener("mousemove",e=>{
   if(!ativo || !segurando) return;
   mover(e.clientX,e.clientY);
-  if(saiuDireita(e.clientX)) desaparecer();
+  if(saiuDireita()) desaparecer();
 });
 
 document.addEventListener("mouseup",()=>segurando=false);
 
-/* 🔲 BOTÃO DE TELA CHEIA (compatível) */
+/* 🔲 BOTÃO DE TELA CHEIA */
 fsBtn.addEventListener("click",()=>{
   const el = document.documentElement;
   if(el.requestFullscreen) el.requestFullscreen();
