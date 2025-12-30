@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Mágica do Anel</title>
+<title>Tela Preta</title>
 
 <style>
 html,body{
@@ -44,7 +44,7 @@ html,body{
   right:0;
   width:50px;            /* 🔧 LARGURA DA BORDA */
   height:100vh;
-  background:rgba(255,0,0,0.25);
+  background:transparent;
   z-index:50;
   pointer-events:none;
 }
@@ -112,7 +112,7 @@ function render(){
 function mostrarInicial(x,y){
   anel.style.display = 'block';
   anel.style.backgroundImage = `url('${IMG_INICIAL}')`;
-  anel.style.filter = 'drop-shadow(0 0 20px gold)'; // 🔧 restaura sombra
+  //anel.style.filter = 'drop-shadow(0 0 20px gold)'; // 🔧 restaura sombra//
   pos.x = x;
   pos.y = y;
   render();
