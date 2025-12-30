@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Mágica do Anel</title>
 
 <style>
@@ -21,27 +21,37 @@ html,body{
   position:relative;
 }
 
+/* ===============================
+   🔧 CONFIGURAÇÃO DO ANEL
+   =============================== */
 #anel{
-  width:250px;
+  width:250px;          /* 🔧 TAMANHO DO ANEL */
   height:250px;
   position:absolute;
   display:none;
-  background:url("ring.png") no-repeat center;
+  background:no-repeat center;
   background-size:contain;
-  filter:drop-shadow(0 0 25px gold);
+  filter:drop-shadow(0 0 20px gold); /* 🔧 SOMBRA */
   pointer-events:none;
 }
 
-#hint{
-  position:absolute;
-  bottom:20px;
-  width:100%;
-  text-align:center;
-  color:#888;
-  font-family:Arial, sans-serif;
-  font-size:14px;
+/* ===============================
+   🔴 BORDA DE DESCARTE (DIREITA)
+   =============================== */
+#bordaDescarte{
+  position:fixed;
+  top:0;
+  right:0;
+  width:50px;            /* 🔧 LARGURA DA BORDA */
+  height:100vh;
+  background:rgba(255,0,0,0.25);
+  z-index:50;
+  pointer-events:none;
 }
 
+/* ===============================
+   🔧 BOTÃO DE TELA CHEIA
+   =============================== */
 #fullscreenBtn{
   position:fixed;
   top:15px;
@@ -58,125 +68,158 @@ html,body{
 </head>
 
 <body>
+
 <div id="stage">
   <audio id="som" src="magica.mp3" preload="auto"></audio>
   <div id="anel"></div>
-  <div id="hint">Toque para revelar • Arraste para a direita</div>
 </div>
 
+<div id="bordaDescarte"></div>
 <button id="fullscreenBtn">Tela cheia</button>
 
 <script>
-const stage = document.getElementById("stage");
-const anel = document.getElementById("anel");
-const som = document.getElementById("som");
-const fsBtn = document.getElementById("fullscreenBtn");
+/* ===============================
+   🔧 CONFIGURAÇÕES
+   =============================== */
+const IMG_INICIAL = 'ring2.png'; // 🔧 primeiro anel
+const IMG_FINAL   = 'ring.png';  // 🔧 anel final
+const TEMPO_TRANSFORMACAO = 1500; // 🔧 ms
+const ATRITO = 0.98;              // 🔧 deslize (0.99 = mais gelo)
+const BORDA_DESCARTE = 50;        // 🔧 largura da borda
 
-let ativo = false;
+/* =============================== */
+const anel = document.getElementById('anel');
+const som  = document.getElementById('som');
+const fsBtn = document.getElementById('fullscreenBtn');
+
+let estado = 0; // 0=oculto | 1=ring2 | 2=ring final
 let segurando = false;
-let velocidadeX = 0;
-let ultimaX = 0;
+let bloquearToque = true;
 
-function mostrar(x,y){
-  anel.style.display = "block";
-  mover(x,y);
-  ativo = true;
+let pos = {x:0,y:0};
+let vel = {x:0,y:0};
+let ultimo = {x:0,y:0};
+
+/* ===============================
+   FUNÇÕES
+   =============================== */
+function render(){
+  const r = anel.offsetWidth / 2;
+  anel.style.left = (pos.x - r) + 'px';
+  anel.style.top  = (pos.y - r) + 'px';
 }
 
-function mover(x,y){
-  const w = anel.offsetWidth;
-  const h = anel.offsetHeight;
-  anel.style.left = (x - w/2) + "px";
-  anel.style.top  = (y - h/2) + "px";
+function mostrarInicial(x,y){
+  anel.style.display = 'block';
+  anel.style.backgroundImage = `url('${IMG_INICIAL}')`;
+  anel.style.filter = 'drop-shadow(0 0 20px gold)'; // 🔧 restaura sombra
+  pos.x = x;
+  pos.y = y;
+  render();
+  estado = 1;
 }
 
-function saiuDireita(){
-  const rect = anel.getBoundingClientRect();
-  return rect.left > window.innerWidth;
+function transformar(){
+  anel.style.transition = 'opacity 0.4s ease';
+  anel.style.opacity = '0';
+
+  setTimeout(()=>{
+    anel.style.backgroundImage = `url('${IMG_FINAL}')`;
+    anel.style.opacity = '1';
+    anel.style.transition = 'none';
+    estado = 2;
+  },400);
 }
 
-function deslizar(){
-  if(!ativo) return;
+function fisica(){
+  if(segurando || estado !== 2) return;
 
-  velocidadeX *= 0.98; // atrito do gelo
+  pos.x += vel.x;
+  pos.y += vel.y;
 
-  const atualX = anel.offsetLeft + velocidadeX;
-  anel.style.left = atualX + "px";
+  vel.x *= ATRITO;
+  vel.y *= ATRITO;
 
-  if(saiuDireita()){
-    desaparecer();
+  render();
+
+  requestAnimationFrame(fisica);
+}
+
+/* ===============================
+   CONTROLES DE TOQUE
+   =============================== */
+document.addEventListener('touchstart',e=>{
+  if(bloquearToque) return;
+
+  const t = e.touches[0];
+
+  if(estado === 0){
+    mostrarInicial(t.clientX, t.clientY);
+  }
+  else if(estado === 1){
+    setTimeout(transformar, TEMPO_TRANSFORMACAO);
+  }
+
+  segurando = true;
+  ultimo.x = t.clientX;
+  ultimo.y = t.clientY;
+});
+
+document.addEventListener('touchmove',e=>{
+  if(!segurando || estado !== 2) return;
+
+  const t = e.touches[0];
+
+  vel.x = t.clientX - ultimo.x;
+  vel.y = t.clientY - ultimo.y;
+
+  pos.x = t.clientX;
+  pos.y = t.clientY;
+
+  ultimo.x = t.clientX;
+  ultimo.y = t.clientY;
+
+  render();
+});
+
+document.addEventListener('touchend',()=>{
+  segurando = false;
+
+  /* 🔴 SE SOLTAR NA BORDA DE DESCARTE */
+  if(estado === 2 && pos.x > innerWidth - BORDA_DESCARTE){
+    anel.style.filter = 'none'; // remove efeito
+    anel.style.display = 'none';
+    estado = 0;
+    vel.x = 0;
+    vel.y = 0;
+
+    if(som){
+      som.currentTime = 0;
+      som.play();
+    }
     return;
   }
 
-  if(Math.abs(velocidadeX) > 0.5){
-    requestAnimationFrame(deslizar);
+  if(estado === 2){
+    requestAnimationFrame(fisica);
   }
-}
-
-function desaparecer(){
-  som.currentTime = 0;
-  som.play();
-
-  anel.style.transition = "opacity .3s";
-  anel.style.opacity = "0";
-
-  setTimeout(()=>{
-    anel.style.display = "none";
-    anel.style.opacity = "1";
-    anel.style.transition = "none";
-    ativo = false;
-  },300);
-}
-
-/* TOUCH */
-stage.addEventListener("touchstart",e=>{
-  e.preventDefault();
-  const t = e.touches[0];
-  segurando = true;
-  ultimaX = t.clientX;
-  if(!ativo) mostrar(t.clientX,t.clientY);
-},{passive:false});
-
-stage.addEventListener("touchmove",e=>{
-  e.preventDefault();
-  if(!ativo || !segurando) return;
-  const t = e.touches[0];
-  velocidadeX = t.clientX - ultimaX;
-  ultimaX = t.clientX;
-  mover(t.clientX,t.clientY);
-},{passive:false});
-
-stage.addEventListener("touchend",()=>{
-  segurando = false;
-  deslizar();
 });
 
-/* MOUSE */
-stage.addEventListener("mousedown",e=>{
-  segurando = true;
-  ultimaX = e.clientX;
-  if(!ativo) mostrar(e.clientX,e.clientY);
-});
-
-stage.addEventListener("mousemove",e=>{
-  if(!ativo || !segurando) return;
-  velocidadeX = e.clientX - ultimaX;
-  ultimaX = e.clientX;
-  mover(e.clientX,e.clientY);
-});
-
-document.addEventListener("mouseup",()=>{
-  segurando = false;
-  deslizar();
-});
-
-/* 🔲 BOTÃO DE TELA CHEIA */
-fsBtn.addEventListener("click",()=>{
+/* ===============================
+   FULLSCREEN
+   =============================== */
+fsBtn.addEventListener('click',()=>{
   const el = document.documentElement;
+
   if(el.requestFullscreen) el.requestFullscreen();
   else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  fsBtn.style.display = "none";
+
+  fsBtn.style.display = 'none';
+
+  // libera toque após fullscreen
+  setTimeout(()=>{ bloquearToque = false; }, 400);
 });
 </script>
+
 </body>
 </html>
