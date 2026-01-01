@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dado D10 3D</title>
+<title>Dado D15 3D</title>
 
 <style>
     body {
@@ -19,45 +19,50 @@
     }
 
     .scene {
-        width: 200px;
-        height: 200px;
+        width: 220px;
+        height: 220px;
     }
 
-    .d10 {
+    .d15 {
         width: 100%;
         height: 100%;
         position: relative;
         transform-style: preserve-3d;
-        transition: transform 1.5s cubic-bezier(.17,.89,.32,1.49);
+        transition: transform 1.6s cubic-bezier(.17,.89,.32,1.49);
         cursor: pointer;
     }
 
     .face {
         position: absolute;
-        width: 120px;
-        height: 120px;
+        width: 130px;
+        height: 130px;
         background: linear-gradient(145deg, #d4af37, #8b6b1e);
         clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 28px;
+        font-size: 26px;
         font-weight: bold;
         color: #111;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+        box-shadow: inset 0 0 12px rgba(0,0,0,0.45);
     }
 
-    /* Posicionamento das faces (aproximação visual de um D10) */
-    .face:nth-child(1)  { transform: rotateY(0deg)   translateZ(90px); }
-    .face:nth-child(2)  { transform: rotateY(36deg)  translateZ(90px); }
-    .face:nth-child(3)  { transform: rotateY(72deg)  translateZ(90px); }
-    .face:nth-child(4)  { transform: rotateY(108deg) translateZ(90px); }
-    .face:nth-child(5)  { transform: rotateY(144deg) translateZ(90px); }
-    .face:nth-child(6)  { transform: rotateY(180deg) translateZ(90px); }
-    .face:nth-child(7)  { transform: rotateY(216deg) translateZ(90px); }
-    .face:nth-child(8)  { transform: rotateY(252deg) translateZ(90px); }
-    .face:nth-child(9)  { transform: rotateY(288deg) translateZ(90px); }
-    .face:nth-child(10) { transform: rotateY(324deg) translateZ(90px); }
+    /* 360 / 15 = 24 graus */
+    .face:nth-child(1)  { transform: rotateY(0deg)   translateZ(95px); }
+    .face:nth-child(2)  { transform: rotateY(24deg)  translateZ(95px); }
+    .face:nth-child(3)  { transform: rotateY(48deg)  translateZ(95px); }
+    .face:nth-child(4)  { transform: rotateY(72deg)  translateZ(95px); }
+    .face:nth-child(5)  { transform: rotateY(96deg)  translateZ(95px); }
+    .face:nth-child(6)  { transform: rotateY(120deg) translateZ(95px); }
+    .face:nth-child(7)  { transform: rotateY(144deg) translateZ(95px); }
+    .face:nth-child(8)  { transform: rotateY(168deg) translateZ(95px); }
+    .face:nth-child(9)  { transform: rotateY(192deg) translateZ(95px); }
+    .face:nth-child(10) { transform: rotateY(216deg) translateZ(95px); }
+    .face:nth-child(11) { transform: rotateY(240deg) translateZ(95px); }
+    .face:nth-child(12) { transform: rotateY(264deg) translateZ(95px); }
+    .face:nth-child(13) { transform: rotateY(288deg) translateZ(95px); }
+    .face:nth-child(14) { transform: rotateY(312deg) translateZ(95px); }
+    .face:nth-child(15) { transform: rotateY(336deg) translateZ(95px); }
 
     .hint {
         position: absolute;
@@ -71,7 +76,7 @@
 <body>
 
 <div class="scene">
-    <div class="d10" id="d10">
+    <div class="d15" id="d15">
         <div class="face">1</div>
         <div class="face">2</div>
         <div class="face">3</div>
@@ -82,28 +87,34 @@
         <div class="face">8</div>
         <div class="face">9</div>
         <div class="face">10</div>
+        <div class="face">11</div>
+        <div class="face">12</div>
+        <div class="face">13</div>
+        <div class="face">14</div>
+        <div class="face">15</div>
     </div>
 </div>
 
 <div class="hint">Clique no dado para rolar</div>
 
 <script>
-    const d10 = document.getElementById("d10");
+    const d15 = document.getElementById("d15");
+    const lados = 15;
 
-    d10.addEventListener("click", () => {
-        const resultado = Math.floor(Math.random() * 10) + 1;
+    d15.addEventListener("click", () => {
+        const resultado = Math.floor(Math.random() * lados) + 1;
 
         const giroX = 720 + Math.random() * 360;
-        const giroY = (resultado - 1) * 36 + 720;
+        const giroY = (resultado - 1) * (360 / lados) + 720;
         const giroZ = Math.random() * 360;
 
-        d10.style.transform = `
+        d15.style.transform = `
             rotateX(${giroX}deg)
             rotateY(${giroY}deg)
             rotateZ(${giroZ}deg)
         `;
 
-        console.log("Resultado D10:", resultado);
+        console.log("Resultado D15:", resultado);
     });
 </script>
 
