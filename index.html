@@ -3,71 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dado D15 3D</title>
+<title>Gerador D15</title>
 
 <style>
     body {
         margin: 0;
         height: 100vh;
-        background: radial-gradient(circle at top, #222, #000);
+        background: radial-gradient(circle, #111, #000);
         display: flex;
         justify-content: center;
         align-items: center;
-        perspective: 1200px;
         font-family: Arial, sans-serif;
-        color: white;
-    }
-
-    .scene {
-        width: 220px;
-        height: 220px;
-    }
-
-    .d15 {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 1.6s cubic-bezier(.17,.89,.32,1.49);
         cursor: pointer;
+        user-select: none;
     }
 
-    .face {
-        position: absolute;
-        width: 130px;
-        height: 130px;
-        background: linear-gradient(145deg, #d4af37, #8b6b1e);
-        clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 26px;
+    #number {
+        font-size: 120px;
         font-weight: bold;
-        color: #111;
-        box-shadow: inset 0 0 12px rgba(0,0,0,0.45);
+        color: #d4af37;
+        text-shadow: 0 0 25px rgba(212,175,55,0.6);
+        transition: transform 0.15s ease, opacity 0.15s ease;
     }
-
-    /* 360 / 15 = 24 graus */
-    .face:nth-child(1)  { transform: rotateY(0deg)   translateZ(95px); }
-    .face:nth-child(2)  { transform: rotateY(24deg)  translateZ(95px); }
-    .face:nth-child(3)  { transform: rotateY(48deg)  translateZ(95px); }
-    .face:nth-child(4)  { transform: rotateY(72deg)  translateZ(95px); }
-    .face:nth-child(5)  { transform: rotateY(96deg)  translateZ(95px); }
-    .face:nth-child(6)  { transform: rotateY(120deg) translateZ(95px); }
-    .face:nth-child(7)  { transform: rotateY(144deg) translateZ(95px); }
-    .face:nth-child(8)  { transform: rotateY(168deg) translateZ(95px); }
-    .face:nth-child(9)  { transform: rotateY(192deg) translateZ(95px); }
-    .face:nth-child(10) { transform: rotateY(216deg) translateZ(95px); }
-    .face:nth-child(11) { transform: rotateY(240deg) translateZ(95px); }
-    .face:nth-child(12) { transform: rotateY(264deg) translateZ(95px); }
-    .face:nth-child(13) { transform: rotateY(288deg) translateZ(95px); }
-    .face:nth-child(14) { transform: rotateY(312deg) translateZ(95px); }
-    .face:nth-child(15) { transform: rotateY(336deg) translateZ(95px); }
 
     .hint {
         position: absolute;
-        bottom: 30px;
+        bottom: 25px;
         font-size: 14px;
+        color: #aaa;
         opacity: 0.7;
     }
 </style>
@@ -75,46 +38,24 @@
 
 <body>
 
-<div class="scene">
-    <div class="d15" id="d15">
-        <div class="face">1</div>
-        <div class="face">2</div>
-        <div class="face">3</div>
-        <div class="face">4</div>
-        <div class="face">5</div>
-        <div class="face">6</div>
-        <div class="face">7</div>
-        <div class="face">8</div>
-        <div class="face">9</div>
-        <div class="face">10</div>
-        <div class="face">11</div>
-        <div class="face">12</div>
-        <div class="face">13</div>
-        <div class="face">14</div>
-        <div class="face">15</div>
-    </div>
-</div>
-
-<div class="hint">Clique no dado para rolar</div>
+<div id="number">?</div>
+<div class="hint">Clique em qualquer lugar</div>
 
 <script>
-    const d15 = document.getElementById("d15");
-    const lados = 15;
+    const number = document.getElementById("number");
+    const max = 15;
 
-    d15.addEventListener("click", () => {
-        const resultado = Math.floor(Math.random() * lados) + 1;
+    document.body.addEventListener("click", () => {
+        number.style.opacity = 0;
+        number.style.transform = "scale(0.8)";
 
-        const giroX = 720 + Math.random() * 360;
-        const giroY = (resultado - 1) * (360 / lados) + 720;
-        const giroZ = Math.random() * 360;
+        setTimeout(() => {
+            const result = Math.floor(Math.random() * max) + 1;
+            number.textContent = result;
 
-        d15.style.transform = `
-            rotateX(${giroX}deg)
-            rotateY(${giroY}deg)
-            rotateZ(${giroZ}deg)
-        `;
-
-        console.log("Resultado D15:", resultado);
+            number.style.opacity = 1;
+            number.style.transform = "scale(1)";
+        }, 100);
     });
 </script>
 
