@@ -30,35 +30,36 @@
 
 <section id="goals" class="page">
   <h2>Metas</h2>
-  <p>(Em desenvolvimento)</p>
+  <p>Em desenvolvimento</p>
 </section>
 
 <section id="lists" class="page">
   <h2>Listas</h2>
-  <p>(Em desenvolvimento)</p>
+  <p>Em desenvolvimento</p>
 </section>
 
 </main>
 
-<!-- MODAL -->
+<!-- MODAL EVENTO -->
 <div id="modal">
   <div class="modal-box">
-    <h3>Novo Evento</h3>
+    <h3>Evento</h3>
 
     <input id="eventTitle" placeholder="Título">
     <textarea id="eventDesc" placeholder="Descrição"></textarea>
 
-    <label>Hora inicial</label>
+    <label>Início</label>
     <input id="eventStart" type="time">
 
-    <label>Duração (min)</label>
-    <input id="eventDuration" type="number" value="60">
+    <label>Fim</label>
+    <input id="eventEnd" type="time">
 
     <label>Cor</label>
-    <input id="eventColor" type="color" value="#2196f3">
+    <input id="eventColor" type="color">
 
     <div class="modal-actions">
       <button id="saveEvent">Salvar</button>
+      <button id="deleteEvent">Excluir</button>
       <button id="cancelEvent">Cancelar</button>
     </div>
   </div>
