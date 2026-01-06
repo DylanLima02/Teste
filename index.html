@@ -12,6 +12,7 @@
 <header>
   <button id="menuBtn">☰</button>
   <h1>Planner Diário</h1>
+  <button id="settingsBtn">⚙️</button>
 </header>
 
 <nav id="menu">
@@ -21,11 +22,9 @@
 </nav>
 
 <main>
-
 <section id="calendar" class="page active">
   <h2>Calendário do Dia</h2>
   <div id="timeline"></div>
-  <button id="addEventBtn">+ Novo Evento</button>
 </section>
 
 <section id="goals" class="page">
@@ -37,30 +36,32 @@
   <h2>Listas</h2>
   <p>Em desenvolvimento</p>
 </section>
-
 </main>
 
 <!-- MODAL EVENTO -->
-<div id="modal">
+<div id="modal"></div>
+
+<!-- MODAL CONFIGURAÇÕES -->
+<div id="settingsModal">
   <div class="modal-box">
-    <h3>Evento</h3>
+    <h3>Configurações</h3>
 
-    <input id="eventTitle" placeholder="Título">
-    <textarea id="eventDesc" placeholder="Descrição"></textarea>
+    <label>Hora inicial do dia</label>
+    <input id="cfgStartHour" type="time">
 
-    <label>Início</label>
-    <input id="eventStart" type="time">
+    <label>Hora final do dia</label>
+    <input id="cfgEndHour" type="time">
 
-    <label>Fim</label>
-    <input id="eventEnd" type="time">
+    <label>Altura de 1 hora (px)</label>
+    <input id="cfgHourSize" type="number" min="30" max="120">
 
-    <label>Cor</label>
-    <input id="eventColor" type="color">
+    <h4>Cores predefinidas</h4>
+    <div id="colorList"></div>
+    <button id="addColor">+ Nova cor</button>
 
     <div class="modal-actions">
-      <button id="saveEvent">Salvar</button>
-      <button id="deleteEvent">Excluir</button>
-      <button id="cancelEvent">Cancelar</button>
+      <button id="saveSettings">Salvar</button>
+      <button id="closeSettings">Cancelar</button>
     </div>
   </div>
 </div>
