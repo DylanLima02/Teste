@@ -13,17 +13,14 @@
   <button id="settingsBtn">⚙️</button>
 </header>
 
-<main>
-  <div id="timelineContainer">
-    <div id="timeline"></div>
-  </div>
-</main>
+<div id="timelineWrapper">
+  <div id="timeline"></div>
+</div>
 
 <!-- MODAL EVENTO -->
-<div id="eventModal" class="modal-overlay">
-  <div class="modal-box">
+<div class="overlay" id="eventOverlay">
+  <div class="modal">
     <h3>Evento</h3>
-
     <input id="evTitle" placeholder="Título">
     <textarea id="evDesc" placeholder="Descrição"></textarea>
 
@@ -36,15 +33,13 @@
     <label>Cor</label>
     <input type="color" id="evColor">
 
-    <div class="modal-actions">
-      <button id="saveEvent">Salvar</button>
-    </div>
+    <button id="saveEvent">Salvar</button>
   </div>
 </div>
 
-<!-- MODAL CONFIGURAÇÕES -->
-<div id="settingsModal" class="modal-overlay">
-  <div class="modal-box">
+<!-- MODAL CONFIG -->
+<div class="overlay" id="configOverlay">
+  <div class="modal">
     <h3>Configurações</h3>
 
     <label>Hora inicial</label>
@@ -56,9 +51,7 @@
     <label>Altura da hora (px)</label>
     <input type="number" id="cfgHourSize" min="40" max="120">
 
-    <div class="modal-actions">
-      <button id="saveCfg">Salvar</button>
-    </div>
+    <button id="saveConfig">Salvar</button>
   </div>
 </div>
 
