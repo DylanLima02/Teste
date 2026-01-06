@@ -8,6 +8,7 @@ body {
   background: #f4f4f4;
 }
 
+/* HEADER */
 header {
   height: 50px;
   background: #1976d2;
@@ -15,13 +16,15 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
 #menuBtn {
   font-size: 22px;
+  cursor: pointer;
 }
 
+/* MENU */
 nav {
   position: fixed;
   top: 50px;
@@ -31,6 +34,7 @@ nav {
   background: #263238;
   padding: 10px;
   transition: 0.3s;
+  z-index: 10;
 }
 
 nav.open {
@@ -41,11 +45,13 @@ nav button {
   width: 100%;
   margin-bottom: 10px;
   padding: 10px;
-  color: white;
   background: none;
-  border: 1px solid #444;
+  color: white;
+  border: 1px solid #455a64;
+  cursor: pointer;
 }
 
+/* MAIN */
 main {
   padding: 20px;
   margin-top: 50px;
@@ -60,7 +66,6 @@ main {
 }
 
 /* CALENDÁRIO */
-
 #timeline {
   position: relative;
   background: white;
@@ -72,39 +77,40 @@ main {
 .hour {
   height: 60px;
   border-bottom: 1px solid #eee;
-  padding-left: 50px;
+  padding-left: 55px;
   position: relative;
 }
 
 .hour span {
   position: absolute;
-  left: 5px;
+  left: 8px;
   top: 5px;
   font-size: 12px;
   color: #666;
 }
 
+/* EVENTO */
 .event {
   position: absolute;
-  left: 60px;
+  left: 65px;
   right: 10px;
   background: #e3f2fd;
   border-left: 5px solid;
-  padding: 5px;
+  padding: 6px;
   border-radius: 4px;
   cursor: grab;
   font-size: 14px;
 }
 
 /* MODAL */
-
 #modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.45);
   align-items: center;
   justify-content: center;
+  z-index: 20;
 }
 
 #modal.active {
@@ -122,6 +128,12 @@ main {
 .modal-box textarea {
   width: 100%;
   margin-bottom: 10px;
+  padding: 5px;
+}
+
+.modal-box textarea {
+  resize: vertical;
+  height: 60px;
 }
 
 .modal-actions {
