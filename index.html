@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Planner Diário</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Planner Diário</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
@@ -15,53 +13,51 @@
   <button id="settingsBtn">⚙️</button>
 </header>
 
-<nav id="menu">
-  <button data-page="calendar">📅 Calendário</button>
-  <button data-page="goals">🎯 Metas</button>
-  <button data-page="lists">📋 Listas</button>
-</nav>
-
 <main>
-<section id="calendar" class="page active">
-  <h2>Calendário do Dia</h2>
-  <div id="timeline"></div>
-</section>
-
-<section id="goals" class="page">
-  <h2>Metas</h2>
-  <p>Em desenvolvimento</p>
-</section>
-
-<section id="lists" class="page">
-  <h2>Listas</h2>
-  <p>Em desenvolvimento</p>
-</section>
+  <div id="timelineContainer">
+    <div id="timeline"></div>
+  </div>
 </main>
 
 <!-- MODAL EVENTO -->
-<div id="modal"></div>
+<div id="eventModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Evento</h3>
+
+    <input id="evTitle" placeholder="Título">
+    <textarea id="evDesc" placeholder="Descrição"></textarea>
+
+    <label>Início</label>
+    <input type="time" id="evStart">
+
+    <label>Fim</label>
+    <input type="time" id="evEnd">
+
+    <label>Cor</label>
+    <input type="color" id="evColor">
+
+    <div class="modal-actions">
+      <button id="saveEvent">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL CONFIGURAÇÕES -->
-<div id="settingsModal">
+<div id="settingsModal" class="modal-overlay">
   <div class="modal-box">
     <h3>Configurações</h3>
 
-    <label>Hora inicial do dia</label>
-    <input id="cfgStartHour" type="time">
+    <label>Hora inicial</label>
+    <input type="time" id="cfgStart">
 
-    <label>Hora final do dia</label>
-    <input id="cfgEndHour" type="time">
+    <label>Hora final</label>
+    <input type="time" id="cfgEnd">
 
-    <label>Altura de 1 hora (px)</label>
-    <input id="cfgHourSize" type="number" min="30" max="120">
-
-    <h4>Cores predefinidas</h4>
-    <div id="colorList"></div>
-    <button id="addColor">+ Nova cor</button>
+    <label>Altura da hora (px)</label>
+    <input type="number" id="cfgHourSize" min="40" max="120">
 
     <div class="modal-actions">
-      <button id="saveSettings">Salvar</button>
-      <button id="closeSettings">Cancelar</button>
+      <button id="saveCfg">Salvar</button>
     </div>
   </div>
 </div>
