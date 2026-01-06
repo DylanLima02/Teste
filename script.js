@@ -44,6 +44,7 @@ function buildTimeline() {
   events.forEach(renderEvent);
 }
 
+/* EVENTO */
 function renderEvent(ev) {
   const el = document.createElement("div");
   el.className = "event";
@@ -53,31 +54,41 @@ function renderEvent(ev) {
   el.style.height = (ev.endMin - ev.startMin) + "px";
   el.style.borderColor = ev.color;
 
-  el.onclick = () => openEditEvent(ev.id);
-
-  enableDrag(el, ev);
+  enableDragAndClick(el, ev);
   timeline.appendChild(el);
 }
 
+/* CLICK EM ÁREA VAZIA DO CRONOGRAMA */
+timeline.addEventListener("click", e => {
+  if (e.target !== timeline) return;
+
+  const rect = timeline.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+
+  const startMin = Math.max(0, Math.floor(y));
+  const endMin = Math.min(startMin + 60, 1440);
+
+  openNewEvent(startMin, endMin);
+});
+
 /* MODAL */
-addEventBtn.onclick = () => {
+addEventBtn.onclick = () => openNewEvent(480, 540);
+
+cancelEventBtn.onclick = () => modal.classList.remove("active");
+
+function openNewEvent(startMin, endMin) {
   editingEventId = null;
   modal.classList.add("active");
 
   eventTitle.value = "";
   eventDesc.value = "";
-  eventStart.value = "08:00";
-  eventEnd.value = "09:00";
+  eventStart.value = minutesToTime(startMin);
+  eventEnd.value = minutesToTime(endMin);
   eventColor.value = "#2196f3";
-};
+}
 
-cancelEventBtn.onclick = () => modal.classList.remove("active");
-
-function openEditEvent(id) {
-  const ev = events.find(e => e.id === id);
-  if (!ev) return;
-
-  editingEventId = id;
+function openEditEvent(ev) {
+  editingEventId = ev.id;
   modal.classList.add("active");
 
   eventTitle.value = ev.title;
@@ -87,12 +98,13 @@ function openEditEvent(id) {
   eventColor.value = ev.color;
 }
 
+/* SALVAR */
 saveEventBtn.onclick = () => {
   const startMin = timeToMinutes(eventStart.value);
   const endMin = timeToMinutes(eventEnd.value);
 
   if (endMin <= startMin) {
-    alert("O horário final deve ser maior que o inicial");
+    alert("Horário final deve ser maior que o inicial");
     return;
   }
 
@@ -118,6 +130,7 @@ saveEventBtn.onclick = () => {
   buildTimeline();
 };
 
+/* EXCLUIR */
 deleteEventBtn.onclick = () => {
   if (!editingEventId) return;
 
@@ -127,25 +140,36 @@ deleteEventBtn.onclick = () => {
   buildTimeline();
 };
 
-/* DRAG */
-function enableDrag(el, ev) {
-  let startY;
+/* DRAG + CLICK DIFERENCIADO */
+function enableDragAndClick(el, ev) {
+  let startY = 0;
+  let moved = false;
 
   el.onmousedown = e => {
+    e.stopPropagation();
     startY = e.clientY;
+    moved = false;
 
     document.onmousemove = m => {
       const dy = m.clientY - startY;
+      if (Math.abs(dy) > 5) moved = true;
       el.style.top = ev.startMin + dy + "px";
     };
 
     document.onmouseup = () => {
+      document.onmousemove = document.onmouseup = null;
+
+      if (!moved) {
+        openEditEvent(ev);
+        return;
+      }
+
       const duration = ev.endMin - ev.startMin;
       ev.startMin = Math.max(0, el.offsetTop);
       ev.endMin = ev.startMin + duration;
 
       localStorage.setItem("events", JSON.stringify(events));
-      document.onmousemove = document.onmouseup = null;
+      buildTimeline();
     };
   };
 }
