@@ -1,75 +1,66 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Planner Diário</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Planner Diário</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- MENU -->
-<button id="menuBtn">☰</button>
+<header>
+  <button id="menuBtn">☰</button>
+  <h1>Planner Diário</h1>
+</header>
 
 <nav id="menu">
-  <button onclick="showPage('calendar')">📅 Calendário</button>
-  <button onclick="showPage('goals')">🎯 Metas</button>
-  <button onclick="showPage('lists')">📋 Listas</button>
+  <button data-page="calendar">📅 Calendário</button>
+  <button data-page="goals">🎯 Metas</button>
+  <button data-page="lists">📋 Listas</button>
 </nav>
 
-<!-- CONTEÚDO -->
 <main>
 
-  <!-- CALENDÁRIO -->
-  <section id="calendar" class="page active">
-    <h2>Calendário do Dia</h2>
-    <div id="timeline"></div>
-    <button onclick="newEvent()">+ Novo Evento</button>
-  </section>
+<section id="calendar" class="page active">
+  <h2>Calendário do Dia</h2>
+  <div id="timeline"></div>
+  <button id="addEventBtn">+ Novo Evento</button>
+</section>
 
-  <!-- METAS -->
-  <section id="goals" class="page">
-    <h2>Metas</h2>
+<section id="goals" class="page">
+  <h2>Metas</h2>
+  <p>(Em desenvolvimento)</p>
+</section>
 
-    <div class="goal-column">
-      <h3>Curto Prazo</h3>
-      <div id="goal-short"></div>
-      <button onclick="addGoal('short')">+ Meta</button>
-    </div>
-
-    <div class="goal-column">
-      <h3>Médio Prazo</h3>
-      <div id="goal-medium"></div>
-      <button onclick="addGoal('medium')">+ Meta</button>
-    </div>
-
-    <div class="goal-column">
-      <h3>Longo Prazo</h3>
-      <div id="goal-long"></div>
-      <button onclick="addGoal('long')">+ Meta</button>
-    </div>
-  </section>
-
-  <!-- LISTAS -->
-  <section id="lists" class="page">
-    <h2>Listas</h2>
-    <div id="listsContainer"></div>
-    <button onclick="addList()">+ Nova Lista</button>
-  </section>
+<section id="lists" class="page">
+  <h2>Listas</h2>
+  <p>(Em desenvolvimento)</p>
+</section>
 
 </main>
 
-<!-- MODAL EVENTO -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <h3>Evento</h3>
+<!-- MODAL -->
+<div id="modal">
+  <div class="modal-box">
+    <h3>Novo Evento</h3>
+
     <input id="eventTitle" placeholder="Título">
     <textarea id="eventDesc" placeholder="Descrição"></textarea>
+
+    <label>Hora inicial</label>
     <input id="eventStart" type="time">
-    <input id="eventDuration" type="number" placeholder="Duração (min)">
-    <input id="eventColor" type="color">
-    <button onclick="saveEvent()">Salvar</button>
-    <button onclick="closeModal()">Cancelar</button>
+
+    <label>Duração (min)</label>
+    <input id="eventDuration" type="number" value="60">
+
+    <label>Cor</label>
+    <input id="eventColor" type="color" value="#2196f3">
+
+    <div class="modal-actions">
+      <button id="saveEvent">Salvar</button>
+      <button id="cancelEvent">Cancelar</button>
+    </div>
   </div>
 </div>
 
