@@ -1,6 +1,4 @@
 const timeline = document.getElementById("timeline");
-const eventModal = document.getElementById("eventModal");
-const settingsModal = document.getElementById("settingsModal");
 
 let settings = JSON.parse(localStorage.getItem("settings")) || {
   start: "06:00",
@@ -9,40 +7,37 @@ let settings = JSON.parse(localStorage.getItem("settings")) || {
 };
 
 let events = JSON.parse(localStorage.getItem("events")) || [];
-let activeEvent = null;
-let dragging = false;
+let currentEvent = null;
 
-// ---------------- UTIL ----------------
-function toMin(t) {
+// ---------- UTILS ----------
+const toMin = t => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
-}
+};
 
-function formatHour(m) {
-  return String(Math.floor(m / 60)).padStart(2, "0") + ":00";
-}
+const toTime = m =>
+  String(Math.floor(m / 60)).padStart(2, "0") + ":" +
+  String(m % 60).padStart(2, "0");
 
-// ---------------- TIMELINE ----------------
-function buildTimeline() {
+// ---------- TIMELINE ----------
+function renderTimeline() {
   timeline.innerHTML = "";
+  timeline.style.setProperty("--hour-size", settings.hourSize + "px");
 
-  const startMin = toMin(settings.start);
-  const endMin = toMin(settings.end);
-  const totalHours = (endMin - startMin) / 60;
+  const start = toMin(settings.start);
+  const end = toMin(settings.end);
 
-  timeline.style.height = totalHours * settings.hourSize + "px";
-
-  for (let m = startMin; m < endMin; m += 60) {
+  for (let m = start; m < end; m += 60) {
     const h = document.createElement("div");
     h.className = "hour";
-    h.style.height = settings.hourSize + "px";
-    h.innerHTML = `<span>${formatHour(m)}</span>`;
+    h.textContent = toTime(m);
     timeline.appendChild(h);
   }
 
   events.forEach(renderEvent);
 }
 
+// ---------- EVENT ----------
 function renderEvent(ev) {
   const el = document.createElement("div");
   el.className = "event";
@@ -57,28 +52,28 @@ function renderEvent(ev) {
 
   timeline.appendChild(el);
 
-  // DRAG
-  let startY, startTop;
+  let moved = false, startY, startTop;
+
   el.onpointerdown = e => {
-    dragging = false;
+    moved = false;
     startY = e.clientY;
     startTop = el.offsetTop;
 
-    document.onpointermove = evMove => {
-      dragging = true;
-      el.style.top = startTop + (evMove.clientY - startY) + "px";
+    document.onpointermove = evm => {
+      moved = true;
+      el.style.top = startTop + (evm.clientY - startY) + "px";
     };
 
     document.onpointerup = () => {
       document.onpointermove = null;
       document.onpointerup = null;
 
-      if (dragging) {
+      if (moved) {
         const minutes =
           (el.offsetTop / settings.hourSize) * 60 + base;
         ev.start = Math.round(minutes / 15) * 15;
-        ev.end = ev.start + (ev.end - ev.start);
-        save();
+        localStorage.setItem("events", JSON.stringify(events));
+        renderTimeline();
       } else {
         openEventModal(ev);
       }
@@ -86,9 +81,9 @@ function renderEvent(ev) {
   };
 }
 
-// ---------------- EVENTOS ----------------
+// ---------- CRIAR EVENTO ----------
 timeline.onclick = e => {
-  if (e.target !== timeline) return;
+  if (e.target.closest(".event")) return;
 
   const rect = timeline.getBoundingClientRect();
   const y = e.clientY - rect.top;
@@ -96,7 +91,7 @@ timeline.onclick = e => {
   const base = toMin(settings.start);
   const start = base + Math.floor((y / settings.hourSize) * 60);
 
-  activeEvent = {
+  currentEvent = {
     id: Date.now(),
     title: "",
     desc: "",
@@ -105,74 +100,62 @@ timeline.onclick = e => {
     color: "#2196f3"
   };
 
-  openEventModal(activeEvent);
+  openEventModal(currentEvent);
 };
+
+// ---------- MODAIS ----------
+const eventOverlay = document.getElementById("eventOverlay");
+const configOverlay = document.getElementById("configOverlay");
 
 function openEventModal(ev) {
-  activeEvent = ev;
-
+  currentEvent = ev;
   evTitle.value = ev.title;
   evDesc.value = ev.desc;
-  evStart.value = minutesToTime(ev.start);
-  evEnd.value = minutesToTime(ev.end);
+  evStart.value = toTime(ev.start);
+  evEnd.value = toTime(ev.end);
   evColor.value = ev.color;
-
-  eventModal.classList.add("active");
+  eventOverlay.classList.add("active");
 }
 
-function minutesToTime(m) {
-  return String(Math.floor(m / 60)).padStart(2, "0") + ":" +
-         String(m % 60).padStart(2, "0");
-}
-
-saveEvent.onclick = () => {
-  activeEvent.title = evTitle.value;
-  activeEvent.desc = evDesc.value;
-  activeEvent.start = toMin(evStart.value);
-  activeEvent.end = toMin(evEnd.value);
-  activeEvent.color = evColor.value;
-
-  if (!events.find(e => e.id === activeEvent.id)) {
-    events.push(activeEvent);
-  }
-
-  closeModals();
-  save();
+eventOverlay.onclick = e => {
+  if (e.target === eventOverlay) eventOverlay.classList.remove("active");
 };
 
-// ---------------- CONFIG ----------------
+saveEvent.onclick = () => {
+  currentEvent.title = evTitle.value;
+  currentEvent.desc = evDesc.value;
+  currentEvent.start = toMin(evStart.value);
+  currentEvent.end = toMin(evEnd.value);
+  currentEvent.color = evColor.value;
+
+  if (!events.find(e => e.id === currentEvent.id))
+    events.push(currentEvent);
+
+  localStorage.setItem("events", JSON.stringify(events));
+  eventOverlay.classList.remove("active");
+  renderTimeline();
+};
+
+// ---------- CONFIG ----------
 settingsBtn.onclick = () => {
   cfgStart.value = settings.start;
   cfgEnd.value = settings.end;
   cfgHourSize.value = settings.hourSize;
-  settingsModal.classList.add("active");
+  configOverlay.classList.add("active");
 };
 
-saveCfg.onclick = () => {
+configOverlay.onclick = e => {
+  if (e.target === configOverlay)
+    configOverlay.classList.remove("active");
+};
+
+saveConfig.onclick = () => {
   settings.start = cfgStart.value;
   settings.end = cfgEnd.value;
-  settings.hourSize = Number(cfgHourSize.value);
+  settings.hourSize = +cfgHourSize.value;
   localStorage.setItem("settings", JSON.stringify(settings));
-  closeModals();
-  buildTimeline();
+  configOverlay.classList.remove("active");
+  renderTimeline();
 };
 
-// ---------------- MODAIS ----------------
-[eventModal, settingsModal].forEach(modal => {
-  modal.onclick = e => {
-    if (e.target === modal) closeModals();
-  };
-});
-
-function closeModals() {
-  eventModal.classList.remove("active");
-  settingsModal.classList.remove("active");
-}
-
-function save() {
-  localStorage.setItem("events", JSON.stringify(events));
-  buildTimeline();
-}
-
-// INIT
-buildTimeline();
+renderTimeline();
