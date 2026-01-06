@@ -1,88 +1,74 @@
-const timeline = document.getElementById("timeline");
+const menuBtn = document.getElementById("menuBtn");
 const menu = document.getElementById("menu");
+const pages = document.querySelectorAll(".page");
+
+const timeline = document.getElementById("timeline");
 const modal = document.getElementById("modal");
 
+const eventTitle = document.getElementById("eventTitle");
+const eventDesc = document.getElementById("eventDesc");
+const eventStart = document.getElementById("eventStart");
+const eventDuration = document.getElementById("eventDuration");
+const eventColor = document.getElementById("eventColor");
+
+const saveEventBtn = document.getElementById("saveEvent");
+const cancelEventBtn = document.getElementById("cancelEvent");
+const addEventBtn = document.getElementById("addEventBtn");
+
 let events = JSON.parse(localStorage.getItem("events")) || [];
-let editingEvent = null;
 
 /* MENU */
-document.getElementById("menuBtn").onclick = () => {
-  menu.classList.toggle("open");
-};
+menuBtn.onclick = () => menu.classList.toggle("open");
 
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  menu.classList.remove("open");
-}
+menu.querySelectorAll("button").forEach(btn => {
+  btn.onclick = () => {
+    pages.forEach(p => p.classList.remove("active"));
+    document.getElementById(btn.dataset.page).classList.add("active");
+    menu.classList.remove("open");
+  };
+});
 
-/* CALENDÁRIO */
+/* TIMELINE */
 function buildTimeline() {
   timeline.innerHTML = "";
   for (let h = 0; h < 24; h++) {
     const hour = document.createElement("div");
     hour.className = "hour";
-    hour.innerHTML = `<span>${String(h).padStart(2,"0")}:00</span>`;
+    hour.innerHTML = `<span>${String(h).padStart(2, "0")}:00</span>`;
     timeline.appendChild(hour);
   }
   events.forEach(renderEvent);
 }
 
 function renderEvent(ev) {
-  const div = document.createElement("div");
-  div.className = "event";
-  div.style.top = (ev.start * 60) + "px";
-  div.style.height = ev.duration + "px";
-  div.style.borderColor = ev.color;
-  div.textContent = ev.title;
+  const el = document.createElement("div");
+  el.className = "event";
+  el.textContent = ev.title;
+  el.style.top = ev.start + "px";
+  el.style.height = ev.duration + "px";
+  el.style.borderColor = ev.color;
 
-  div.onclick = () => editEvent(ev.id);
-  enableDrag(div, ev);
-
-  timeline.appendChild(div);
+  enableDrag(el, ev);
+  timeline.appendChild(el);
 }
 
-function newEvent() {
-  editingEvent = null;
-  modal.style.display = "block";
-}
+/* MODAL */
+addEventBtn.onclick = () => modal.classList.add("active");
+cancelEventBtn.onclick = () => modal.classList.remove("active");
 
-function editEvent(id) {
-  const ev = events.find(e => e.id === id);
-  editingEvent = ev;
-  eventTitle.value = ev.title;
-  eventDesc.value = ev.desc;
-  eventStart.value = minutesToTime(ev.start);
-  eventDuration.value = ev.duration;
-  eventColor.value = ev.color;
-  modal.style.display = "block";
-}
-
-function saveEvent() {
-  const data = {
-    id: editingEvent?.id || Date.now(),
+saveEventBtn.onclick = () => {
+  events.push({
     title: eventTitle.value,
     desc: eventDesc.value,
-    start: timeToMinutes(eventStart.value),
+    start: timeToPixels(eventStart.value),
     duration: Number(eventDuration.value),
     color: eventColor.value
-  };
-
-  if (editingEvent) {
-    events = events.map(e => e.id === data.id ? data : e);
-  } else {
-    events.push(data);
-  }
+  });
 
   localStorage.setItem("events", JSON.stringify(events));
-  closeModal();
+  modal.classList.remove("active");
   buildTimeline();
-}
-
-function closeModal() {
-  modal.style.display = "none";
-  eventTitle.value = eventDesc.value = eventStart.value = eventDuration.value = "";
-}
+};
 
 /* DRAG */
 function enableDrag(el, ev) {
@@ -91,11 +77,11 @@ function enableDrag(el, ev) {
   el.onmousedown = e => {
     startY = e.clientY;
     document.onmousemove = m => {
-      const delta = m.clientY - startY;
-      el.style.top = (ev.start * 60 + delta) + "px";
+      const dy = m.clientY - startY;
+      el.style.top = ev.start + dy + "px";
     };
     document.onmouseup = () => {
-      ev.start = Math.max(0, Math.round(el.offsetTop / 60));
+      ev.start = el.offsetTop;
       localStorage.setItem("events", JSON.stringify(events));
       document.onmousemove = document.onmouseup = null;
     };
@@ -103,14 +89,9 @@ function enableDrag(el, ev) {
 }
 
 /* HELPERS */
-function timeToMinutes(t) {
-  const [h, m] = t.split(":").map(Number);
+function timeToPixels(time) {
+  const [h, m] = time.split(":").map(Number);
   return h * 60 + m;
-}
-
-function minutesToTime(m) {
-  const h = Math.floor(m / 60);
-  return `${String(h).padStart(2,"0")}:00`;
 }
 
 buildTimeline();
